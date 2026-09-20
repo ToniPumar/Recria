@@ -1,0 +1,264 @@
+<!DOCTYPE html><html lang="gl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Recría · Planificación gandeira</title><link rel="stylesheet" href="/css/estilos.css"></head><body>
+<div id="aviso-resolucion"><div class="aviso-resolucion-contido"><div class="aviso-icono">🖥️</div><h1>Resolución non compatible</h1><p>Esta aplicación está deseñada para ordenadores de escritorio.</p><p>Resolución mínima: <strong>1280 × 720</strong>.</p><div class="resolucion-actual">Resolución actual: <strong id="resolucion-actual">-</strong></div></div></div>
+<div id="aplicacion"><aside class="menu-lateral"><div class="logo"><div class="logo-icono">R</div><div><div class="logo-titulo">Recría</div><div class="logo-subtitulo">Planificación gandeira</div></div></div>
+<nav class="menu"><button class="menu-elemento activo" data-vista="resumo"><span class="menu-icono">⌂</span>Resumo</button><button class="menu-elemento" data-vista="rebano"><span class="menu-icono">▦</span>Rebaño</button><button class="menu-elemento" data-vista="planificacion"><span class="menu-icono">◎</span>Planificación</button><button class="menu-elemento" data-vista="configuracion"><span class="menu-icono">⚙</span>Configuración</button><button class="menu-elemento" data-vista="axuda"><span class="menu-icono">?</span>Axuda</button></nav><div class="menu-inferior"><div class="version">Versión 0.10.18</div></div></aside>
+<main class="zona-principal"><header class="cabeceira"><div><h1 id="titulo-vista">Resumo</h1><p id="subtitulo-vista">Análise histórica de mortalidade, reposición e perdas</p></div><div class="estado-arquivo"><div class="estado-punto"></div><div><div class="estado-titulo">Sen libro cargado</div><div class="estado-subtitulo">Indica o período e carga o Libro de explotación</div></div></div></header>
+<section id="vista-resumo" class="contido vista vista-activa"><article class="panel panel-importacion"><div class="panel-cabeceira"><div><h2>Libro de explotación</h2><p>Indica exactamente o período que cobre o ficheiro.</p></div></div><div class="periodo-libro"><div class="campo-data"><label for="data-inicio-libro">Data inicial</label><input id="data-inicio-libro" type="date"></div><div class="separador-periodo">→</div><div class="campo-data"><label for="data-fin-libro">Data final</label><input id="data-fin-libro" type="date"></div></div><div id="zona-subida" class="zona-subida"><div class="zona-subida-icono">⇧</div><h3>Cargar Libro de explotación</h3><p>O programa ignorará para os cálculos os eventos que queden fóra do intervalo indicado.</p><div class="carga-local"><button id="boton-seleccionar-arquivo" type="button" class="boton-principal">Examinar ficheiro</button><small>Formatos admitidos: XLSX e XLS</small></div><div class="separador-carga"><span>ou cargar desde URL</span></div><div class="carga-url"><div class="fila-url"><input id="url-libro" type="url" placeholder="Pega aquí unha URL de Dropbox, Google Drive ou directa"><button id="boton-cargar-url-libro" type="button" class="boton-secundario">Cargar URL</button></div><select id="historial-url-libro"><option value="">Últimas URLs…</option></select><small id="estado-url-libro">Gárdanse as 10 últimas URLs distintas neste navegador.</small></div></div><input id="input-arquivo" type="file" accept=".xlsx,.xls" hidden></article><div id="resultados-analise"></div></section>
+<section id="vista-rebano" class="contido vista"><article class="panel"><div class="panel-cabeceira panel-cabeceira-flex"><div><h2>Rebaño nunha data</h2><p>Reconstrúe os animais presentes segundo nacementos e baixas do libro.</p></div><div class="campo-data"><label for="data-rebano">Data</label><input id="data-rebano" type="date"></div></div><div id="resultado-rebano"></div></article></section>
+
+<section id="vista-planificacion" class="contido vista">
+  <article class="panel panel-planificacion">
+    <div class="panel-cabeceira">
+      <div>
+        <h2>Necesidade de recría</h2>
+        <p>Estima cantas femias deben chegar a primeiro parto para cubrir reposición e crecemento.</p>
+      </div>
+    </div>
+
+    <div id="planificacion-sen-libro" class="estado-baleiro">
+      <h3>Primeiro carga o Libro de explotación</h3>
+      <p>Usaremos a idade real da recría e a referencia histórica para preparar o escenario.</p>
+    </div>
+
+    <div id="formulario-planificacion" class="planificacion-contido" hidden>
+      <div class="bloque-planificacion">
+        <div class="bloque-planificacion-titulo">
+          <div><span class="paso-plan">1</span><strong>Situación e obxectivo</strong></div>
+          <small>Podes introducir os datos manualmente ou cargalos desde o informe do robot.</small>
+        </div>
+
+        <div class="modo-planificacion">
+          <label class="check-automatico"><input id="plan-automatico" type="checkbox"><span>Automático desde ficheiro do robot</span></label>
+          <label><span>Data do informe</span><input id="plan-data-robot" type="date"><small>Debe coincidir coa Data situación.</small></label>
+          <div class="carga-robot-fontes"><div class="fonte-robot"><span class="fonte-robot-titulo">Ficheiro local</span><button id="plan-cargar-robot" class="boton-secundario" type="button">Examinar ficheiro do robot</button><input id="plan-input-robot" type="file" accept=".csv,.xlsx,.xls" hidden></div><div class="fonte-robot"><span class="fonte-robot-titulo">Ou desde URL</span><div class="carga-url carga-url-robot"><div class="fila-url"><input id="plan-url-robot" type="url" placeholder="Pega aquí a URL do informe do robot"><button id="plan-cargar-url-robot" type="button" class="boton-secundario">Cargar URL</button></div><select id="plan-historial-url-robot"><option value="">Últimas URLs…</option></select></div></div></div>
+          <small id="plan-estado-robot" class="estado-robot">Sen informe cargado. Todo animal do robot debe existir no Libro; un animal do Libro pode non aparecer no robot.</small>
+        </div>
+        <div id="plan-datos-automaticos" class="datos-automaticos" hidden></div>
+
+        <div class="grella-planificacion grella-5">
+          <label><span>Data situación</span><input id="plan-data-situacion" type="date"><small id="plan-total-animais">Animais presentes: —</small></label>
+          <label><span>Vacas en leite</span><input id="plan-vacas-leite" type="number" min="0" step="1" value="55"><small id="plan-validacion-vacas">Leite + secas debe caber no total.</small></label>
+          <label><span>Vacas secas</span><input id="plan-vacas-secas" type="number" min="0" step="1" value="5"><small>Incluídas nas vacas adultas.</small></label>
+          <label><span>Data obxectivo</span><input id="plan-data-obxectivo" type="date"><small>Debe ser posterior á situación.</small></label>
+          <label><span>Horizonte rápido</span><select id="plan-horizonte"><option value="12">12 meses</option><option value="18">18 meses</option><option value="24" selected>24 meses</option><option value="36">36 meses</option><option value="custom">Personalizado</option></select><small>Podes cambiar despois a data exacta.</small></label>
+          <label><span>Obxectivo en leite</span><input id="plan-obxectivo-leite" type="number" min="0" step="1" value="70"><small>Vacas que queres ter en produción.</small></label>
+        </div>
+      </div>
+
+      <div class="bloque-planificacion">
+        <div class="bloque-planificacion-titulo">
+          <div><span class="paso-plan">2</span><strong>Hipóteses utilizadas</strong></div>
+          <small>Son referencias históricas e configuración global. Non se editan aquí.</small>
+        </div>
+        <div class="selector-referencia"><label><span>Referencia histórica para os cálculos</span><select id="plan-referencia-historica"></select><small id="plan-referencia-descricion">Escolle un ano, media simple ou media ponderada.</small></label></div>
+        <div class="grella-planificacion grella-4 hipoteses-bloqueadas">
+          <label><span>Mortalidade femias tenreiras</span><input id="plan-mort-femias" type="number" readonly><small id="ref-mort-femias">Histórico: —</small></label>
+          <label><span>Mortalidade xovencas</span><input id="plan-mort-xovencas" type="number" readonly><small id="ref-mort-xovencas">Histórico: —</small></label>
+          <label><span>Taxa de reposición</span><input id="plan-reposicion" type="number" readonly><small id="ref-reposicion">Histórico: —</small></label>
+          <label><span>Marxe recría/taxas</span><input id="plan-marxe" type="number" readonly><small>Puntos de seguridade aplicados ás taxas.</small></label>
+        </div>
+      </div>
+
+      <div class="planificacion-accions">
+        <div class="nota-planificacion">O plan separa <strong>o que xa tes confirmado</strong> do que <strong>debes conseguir</strong> nos próximos meses.</div>
+        <button id="boton-calcular-planificacion" class="boton-principal boton-calcular" type="button">Calcular necesidade</button>
+      </div>
+
+      <div id="resultado-planificacion"></div>
+    </div>
+  </article>
+</section>
+<section id="vista-configuracion" class="contido vista">
+<article class="panel panel-configuracion">
+  <div class="panel-cabeceira"><div><h2>Parámetros globais</h2><p>Gárdanse no navegador mediante localStorage e úsanse como valores predeterminados.</p></div></div>
+
+  <h3 class="subtitulo-config">Economía · perdas por mortalidade</h3>
+  <p class="texto-config-curto">Valores base de oportunidade por animal morto. Aos animais novos súmase tamén o custo diario acumulado. A morte dunha vaca Frisona adulta usa o valor específico de vaca adulta.</p>
+  <div class="parametros parametros-editables parametros-en-fila">
+    <label class="parametro parametro-editable"><span>Frisona femia</span><div class="campo-economico"><input id="perda-frisona-femia" type="number" min="0" step="10"><small>€</small></div></label>
+    <label class="parametro parametro-editable"><span>Frisona macho</span><div class="campo-economico"><input id="perda-frisona-macho" type="number" min="0" step="10"><small>€</small></div></label>
+    <label class="parametro parametro-editable"><span>Carne femia</span><div class="campo-economico"><input id="perda-carne-femia" type="number" min="0" step="10"><small>€</small></div></label>
+    <label class="parametro parametro-editable"><span>Carne macho</span><div class="campo-economico"><input id="perda-carne-macho" type="number" min="0" step="10"><small>€</small></div></label>
+    <label class="parametro parametro-editable"><span>Custo diario</span><div class="campo-economico"><input id="custo-diario" type="number" min="0" step="0.1"><small>€/día</small></div></label>
+    <label class="parametro parametro-editable"><span>Morte vaca Frisona adulta</span><div class="campo-economico"><input id="custo-morte-vaca" type="number" min="0" step="50"><small>€</small></div></label>
+  </div>
+  <input id="custo-oportunidade-femia" type="hidden"><input id="custo-oportunidade-macho" type="hidden">
+
+  <h3 class="subtitulo-config">Histórico · límites de idade</h3>
+  <div class="parametros parametros-editables parametros-reproducion">
+    <label class="parametro parametro-editable"><span>Tenreiro/a ata</span><div class="campo-economico"><input id="idade-max-tenreiro" type="number" min="1" step="1"><small>días</small></div></label>
+    <label class="parametro parametro-editable"><span>Vaca adulta desde</span><div class="campo-economico"><input id="idade-vaca-meses" type="number" min="1" step="0.1"><small>meses</small></div></label>
+  </div>
+
+  <h3 class="subtitulo-config">Reprodución · Xovencas</h3>
+  <div class="parametros parametros-editables parametros-reproducion">
+    <label class="parametro parametro-editable"><span>Idade 1ª inseminación</span><div class="campo-economico"><input id="idade-primeira-inseminacion" type="number" min="0" step="0.1"><small>meses</small></div></label>
+    <label class="parametro parametro-editable"><span>Taxa de preñez xovencas</span><div class="campo-economico"><input id="taxa-prenez-xovencas" type="number" min="0" max="100" step="0.1"><small>%</small></div></label>
+  </div>
+  <h3 class="subtitulo-config">Reprodución · Vacas</h3>
+  <div class="parametros parametros-editables parametros-reproducion">
+    <label class="parametro parametro-editable"><span>1ª lactación: comezar a inseminar</span><div class="campo-economico"><input id="dias-leite-primeira-inseminacion-primiparas" type="number" min="0" step="1"><small>DEL</small></div></label>
+    <label class="parametro parametro-editable"><span>2ª lactación ou máis: comezar a inseminar</span><div class="campo-economico"><input id="dias-leite-primeira-inseminacion-vacas" type="number" min="0" step="1"><small>DEL</small></div></label>
+    <label class="parametro parametro-editable"><span>Taxa de preñez vacas</span><div class="campo-economico"><input id="taxa-prenez-vacas" type="number" min="0" max="100" step="0.1"><small>%</small></div></label>
+  </div>
+  <h3 class="subtitulo-config">Duración media da lactación dunha vaca de descarte</h3>
+  <p class="texto-config-curto">Úsase só para vacas marcadas <strong>Descarte = S</strong>. Ao alcanzar esta duración pasan a ser candidatas a saída, pero o calendario pode conservalas se fan falta para non baixar do obxectivo de vacas en ordeño nos meses seguintes.</p>
+  <div class="parametros parametros-editables parametros-reproducion">
+    <label class="parametro parametro-editable"><span>Duración lactación vaca descarte</span><div class="campo-economico"><input id="duracion-lactacion-descarte" type="number" min="1" step="1"><small>días en leite</small></div></label>
+    <label class="parametro parametro-editable"><span>Lactacións medias por vaca</span><div class="campo-economico"><input id="lactacions-medias-vaca" type="number" min="1" step="0.1"><small>admite decimais</small></div></label>
+  </div>
+
+  <h3 class="subtitulo-config">Parámetros comúns</h3>
+  <div class="parametros parametros-editables parametros-reproducion">
+    <label class="parametro parametro-editable"><span>Duración ciclo</span><div class="campo-economico"><input id="duracion-ciclo" type="number" min="1" step="1"><small>días</small></div></label>
+    <label class="parametro parametro-editable"><span>Xestación ata parto</span><div class="campo-economico"><input id="duracion-xestacion" type="number" min="1" step="1"><small>días</small></div></label>
+    <label class="parametro parametro-editable"><span>Horizonte do plan</span><div class="campo-economico"><select id="horizonte-plan-meses"><option value="12">12 meses</option><option value="24">24 meses</option><option value="36">36 meses</option></select><small>máximo de previsión</small></div></label>
+    <label class="parametro parametro-editable"><span>Período seco medio</span><div class="campo-economico"><input id="duracion-secado" type="number" min="0" step="1"><small>días</small></div></label>
+    <label class="parametro parametro-editable"><span>Marxe seguridade recría</span><div class="campo-economico"><input id="marxe-seguridade" type="number" min="0" max="100" step="0.1"><small>puntos</small></div></label>
+    <label class="parametro parametro-editable"><span>Marxe vacas en leite</span><div class="campo-economico"><input id="marxe-vacas-leite" type="number" min="0" step="1"><small>vacas</small></div></label>
+  </div>
+
+  <h3 class="subtitulo-config">Sistema de puntuación de descartes</h3>
+  <p class="texto-config-curto">Primeiro aplícanse filtros; só despois se puntúan as candidatas. As medias de produción calcúlanse por separado para 1ª lactación e para 2ª ou máis.</p>
+  <div class="parametros parametros-editables parametros-reproducion">
+    <label class="parametro parametro-editable"><span>Primíparas: DEL mínimo</span><div class="campo-economico"><input id="descarte-del-primiparas" type="number" min="0" step="1"><small>días</small></div></label>
+    <label class="parametro parametro-editable"><span>Vacas 2+: DEL mínimo</span><div class="campo-economico"><input id="descarte-del-adultas" type="number" min="0" step="1"><small>días</small></div></label>
+    <label class="parametro parametro-editable"><span>Protexer se pare en ≤</span><div class="campo-economico"><input id="descarte-dias-parto" type="number" min="0" step="1"><small>días</small></div></label>
+    <label class="parametro parametro-editable"><span>Primípara: só suxerir se está ≥</span><div class="campo-economico"><input id="descarte-desfase-primipara" type="number" min="0" max="100" step="1"><small>% baixo a media</small></div></label>
+  </div>
+  <div class="parametros parametros-editables parametros-reproducion">
+    <label class="parametro parametro-editable"><span>Peso leite normalizado</span><div class="campo-economico"><input id="descarte-peso-leite" type="number" min="0" max="100" step="1"><small>%</small></div></label>
+    <label class="parametro parametro-editable"><span>Peso produción 305 d</span><div class="campo-economico"><input id="descarte-peso-305" type="number" min="0" max="100" step="1"><small>%</small></div></label>
+    <label class="parametro parametro-editable"><span>Peso células</span><div class="campo-economico"><input id="descarte-peso-celulas" type="number" min="0" max="100" step="1"><small>%</small></div></label>
+    <label class="parametro parametro-editable"><span>Peso tempo no robot</span><div class="campo-economico"><input id="descarte-peso-tempo" type="number" min="0" max="100" step="1"><small>%</small></div></label>
+  </div>
+  <p class="nota-config">Os catro pesos deben sumar 100 %. A desviación respecto á media xa se incorpora de forma progresiva na puntuación, sen bonus adicionais. “Non inseminar máis” non exclúe a vaca do ranking: puntúase igual e a puntuación decide a súa prioridade.</p>
+
+  <div class="accions-configuracion"><button id="boton-restaurar-configuracion" class="boton-secundario" type="button">Restaurar predeterminados</button><button id="boton-gardar-configuracion" class="boton-principal" type="button">Gardar cambios</button></div>
+  <p id="mensaxe-configuracion" class="mensaxe-configuracion">Os cambios non se aplican ata premer “Gardar cambios”.</p>
+</article>
+</section>
+<section id="vista-axuda" class="contido vista">
+<article class="panel panel-axuda-completa">
+  <div class="panel-cabeceira"><div><h2>Axuda completa</h2><p>Datos necesarios, análise histórica, calendario reprodutivo, planificación, configuración e descartes.</p></div></div>
+  <div class="texto-axuda axuda-completa">
+
+<h3>1. Que fai a aplicación</h3>
+<p>A aplicación combina o <strong>Libro de explotación</strong>, o <strong>informe do robot</strong> e a configuración gardada no navegador. Primeiro reconstrúe o histórico, despois identifica o rabaño real na Data situación e finalmente crea un calendario reprodutivo animal por animal. A planificación mensual sae dese calendario.</p>
+<p>Hai tres niveis de certeza: <strong>confirmado</strong> (dato real do Libro/robot), <strong>probable</strong> (resultado esperado aplicando taxas) e <strong>planificado</strong> (acción futura recomendada).</p>
+
+<h3>2. Libro de explotación: cabeceiras</h3>
+<table class="tabela-anual tabela-axuda"><thead><tr><th>Cabeceira</th><th>Obrigatoria</th><th>Para que se usa</th></tr></thead><tbody>
+<tr><td><strong>Crotal</strong></td><td>Si</td><td>Identificación única do animal. Para enlazar co robot utilízanse os últimos 9 díxitos.</td></tr>
+<tr><td><strong>Sexo</strong></td><td>Si</td><td>Distingue femias e machos. Despois da idade de tenreiro só as femias Frisona entran nos cálculos de recría/vacas.</td></tr>
+<tr><td><strong>Raza</strong></td><td>Si</td><td>Separa Frisona, Conxunto Mestizo/carne e outras razas na análise.</td></tr>
+<tr><td><strong>D. Nacem.</strong></td><td>Si</td><td>Data de nacemento. Permite calcular a idade exacta en cada evento e o calendario das xovencas.</td></tr>
+<tr><td><strong>Baixa</strong></td><td>Si</td><td>Tipo de baixa. <code>Morte</code> conta como mortalidade; <code>Saída</code> non é mortalidade e, en vacas adultas Frisona, conta como reposición.</td></tr>
+<tr><td><strong>D. Baixa</strong></td><td>Si</td><td>Data efectiva do evento. O evento pertence ao ano desta data, non ao ano de nacemento.</td></tr>
+<tr><td><strong>D. Entrada</strong></td><td>Non</td><td>Se existe, axuda a delimitar desde cando o animal estivo exposto/presente na explotación.</td></tr>
+</tbody></table>
+
+<h3>3. Informe do robot: cabeceiras</h3>
+<table class="tabela-anual tabela-axuda"><thead><tr><th>Cabeceira</th><th>Uso</th></tr></thead><tbody>
+<tr><td><strong>Número de vaca</strong></td><td>Identificación curta que se mostra no calendario diario.</td></tr>
+<tr><td><strong>Número de vida</strong></td><td>Crotal/identificación para enlazar cos últimos 9 díxitos do Libro.</td></tr>
+<tr><td><strong>Nº lactación.</strong></td><td>Indica se é primípara (1ª) ou vaca de 2ª+ e permite aplicar DEL de IA distintos.</td></tr>
+<tr><td><strong>Días lactación</strong></td><td>DEL actual; decide cando lle corresponde a próxima IA ou cando pode chegar ao límite terminal.</td></tr>
+<tr><td><strong>Estado de reproducción</strong></td><td>Preñada, inseminada ou sen inseminar. Determina o punto de partida do calendario.</td></tr>
+<tr><td><strong>Días de gestación</strong></td><td>Permite calcular o parto dunha preñada cando non hai unha data directa.</td></tr>
+<tr><td><strong>Días hasta secado</strong></td><td>Usado para manter o secado confirmado do robot.</td></tr>
+<tr><td><strong>Fecha de parto esperada</strong></td><td>Data prioritaria para o parto confirmado cando está dispoñible.</td></tr>
+<tr><td><strong>Producción</strong></td><td>Distingue En lactación, Secado e Ganado joven.</td></tr>
+<tr><td><strong>Media de producción ultimas 24h</strong></td><td>Producción actual para análise/ranking de descarte.</td></tr>
+<tr><td><strong>Producción prevista (305 días)</strong></td><td>Proxección de lactación utilizada na puntuación de descarte.</td></tr>
+<tr><td><strong>Media grasa % / Media proteina %</strong></td><td>Permiten normalizar o leite a 4,0 % graxa e 3,3 % proteína.</td></tr>
+<tr><td><strong>Indicación de células</strong></td><td>Compoñente de saúde mamaria usado na puntuación.</td></tr>
+<tr><td><strong>Tiempo en cubículo</strong></td><td>Tempo/ocupación do robot, usado como compoñente da puntuación.</td></tr>
+<tr><td><strong>Sexado</strong></td><td>Obrigatoria. <code>S/Si</code> = sexado, <code>N/No</code> = leiteiro convencional, <code>C/Carne</code> = carne. Só importa en preñadas/inseminadas; se están sen inseminar non se mostra seme no Rebaño.</td></tr>
+<tr><td><strong>Descarte</strong></td><td>Obrigatoria. <code>S/Si</code> impide iniciar novas IA; <code>N/No</code> segue no programa. Unha preñez xa existente nunca se borra.</td></tr>
+</tbody></table>
+<p>O robot é <strong>obrigatorio para calcular a planificación</strong> e debe corresponder exactamente á Data situación. Robot → Libro debe enlazar; unha colisión de dous crotales distintos cos mesmos últimos 9 díxitos é un erro.</p>
+
+<h3>4. Como se fai a análise histórica</h3>
+<p>O período seleccionado manda. Cada baixa clasifícase segundo a <strong>idade que tiña o animal na D. Baixa</strong>. Ata o límite de tenreiro analízanse mortes por raza e sexo; despois dese límite, a recría e as vacas céntranse nas femias Frisona.</p>
+<p><strong>Mortalidade</strong> inclúe só <code>Baixa=Morte</code>. <strong>Reposición de vacas</strong> inclúe mortes de vacas adultas Frisona + <code>Saída</code> de vacas adultas Frisona. Unha saída de recría nova non se trata como mortalidade.</p>
+<p>A análise mostra o período global e cada ano natural. A <strong>media histórica ponderada</strong> utiliza só anos naturais completos e calcula <code>suma de eventos / suma de animais expostos</code>; os anos parciais móstranse pero non pesan na referencia ponderada.</p>
+
+<h3>5. Como se crea o calendario reprodutivo</h3>
+<p>O motor simula exclusivamente os <strong>animais que existen na Data situación</strong>. Unha xovenca existente pode chegar á IA, quedar preñada, parir, converterse en vaca de 1ª lactación e continuar os seus seguintes ciclos dentro do horizonte. En cambio, unha femia que aínda non naceu só se contabiliza como recría virtual: <strong>non se lle crean IA, partos nin descendencia</strong>.</p>
+<p><strong>Xovenca sen inseminar:</strong> chega á idade de primeira IA configurada → IA sexada → se non queda preñada, repite cada ciclo → parto → convértese en primípara.</p>
+<p><strong>Primípara:</strong> usa o seu DEL específico de primeira IA. Isto permite atrasala respecto dunha vaca adulta porque adoita ser máis persistente.</p>
+<p><strong>Vaca de 2ª ou máis:</strong> utiliza o DEL específico de vacas adultas. Se xa pasou ese DEL e está sen inseminar, a seguinte IA planifícase ao seguinte ciclo.</p>
+<p><strong>Inseminada:</strong> a IA xa ocorreu. A taxa de preñez divide o resultado entre preñez probable e fracción que continúa baleira; esta última xera repeticións.</p>
+<p><strong>Preñada:</strong> parto e secado quedan comprometidos. Mesmo se supera a media de lactacións, remátase esa preñez; o límite só impide iniciar outra IA despois.</p>
+
+<h3>6. Lactacións medias e final de vida produtiva</h3>
+<p><strong>Lactacións medias por vaca</strong> indica ata onde se proxectan novas lactacións. Admite decimais: 3,2 interprétase como que estatisticamente un 20 % das vacas de 3ª continúan cara unha 4ª. Se unha vaca xa está inseminada/preñada por riba dese límite, esa preñez mantense.</p>
+<p><strong>Duración lactación vaca descarte</strong> é o DEL terminal de referencia. Cando unha vaca xa non debe iniciar outra IA e chega a ese DEL, pasa a candidata de saída.</p>
+
+<h3>7. Como se regula o número de vacas</h3>
+<p>O obxectivo principal é manter as vacas en leite. Se configuras 55 e unha marxe de 2, o programa tenta traballar arredor de <strong>55–57 vacas en leite</strong>. Un exceso persistente pode xerar descartes; antes de executalos o motor mira os meses seguintes para evitar baixar de 55 por secados próximos.</p>
+<p>Primeiro aproveita candidatas que xa chegaron ao DEL terminal. Se o rabaño continúa por riba do teito, pode recomendar máis saídas sen esperar necesariamente ao DEL terminal. O calendario decide <strong>cantas</strong> fan falta; o ranking axuda a decidir <strong>cales</strong>.</p>
+
+<h3>8. Como se decide o seme</h3>
+<p>Primeiro calcúlanse todas as IA obrigatorias por idade, DEL e repeticións. Despois asígnase o seme. As <strong>xovencas existentes recoméndanse sempre con sexado</strong> por criterio de mellora xenética. Nas vacas utilízase sexado só cando aínda fan falta futuras femias; cando a recría está cuberta recoméndase carne.</p>
+<p>As preñeces e nacementos futuros aplican taxa de preñez, probabilidade de sexo e supervivencia. As femias resultantes engádense á recría virtual para contabilizar a futura cabaña, pero non se reproducen dentro do modelo.</p>
+
+<h3>9. Táboa mensual e calendario diario</h3>
+<p>A táboa mensual resume <strong>Leite inicio + partos/retornos − secados − descartes = Leite final</strong>, xunto con secas, recría femia, IA totais, sexado en xovencas, sexado en vacas, carne, cabaña e estado.</p>
+<p>O botón <strong>📅 Calendario</strong> abre un almanaque navegable mes a mes. Cada día mostra IA, repeticións, secados, partos e candidatas de descarte. O evento leva o número de vaca; se non está dispoñible, utiliza a identificación/crotal. As IA indican tamén se se trata dunha xovenca, primípara ou vaca adulta e o limiar que activou a acción.</p>
+
+<h3>10. Parámetros de Configuración</h3>
+<table class="tabela-anual tabela-axuda"><thead><tr><th>Parámetro</th><th>Significado</th></tr></thead><tbody>
+<tr><td>Idade 1ª inseminación xovencas</td><td>Meses de idade aos que unha xovenca existente entra no programa reprodutivo.</td></tr>
+<tr><td>1ª lactación: comezar a inseminar</td><td>DEL de primeira IA das primíparas.</td></tr>
+<tr><td>2ª lactación ou máis: comezar a inseminar</td><td>DEL de primeira IA das vacas adultas.</td></tr>
+<tr><td>Taxa de preñez xovencas / vacas</td><td>Probabilidade de concepción por intento; a fracción que falla repite segundo o ciclo.</td></tr>
+<tr><td>Duración ciclo</td><td>Días entre intentos de IA cando non se produce preñez.</td></tr>
+<tr><td>Xestación ata parto</td><td>Días utilizados para proxectar un parto desde unha IA.</td></tr>
+<tr><td>Período seco medio</td><td>Días antes do parto nos que unha vaca pasa de leite a seca.</td></tr>
+<tr><td>Lactacións medias por vaca</td><td>Límite estatístico para iniciar novas lactacións.</td></tr>
+<tr><td>Duración lactación vaca descarte</td><td>DEL terminal para converter unha vaca sen novo ciclo en candidata de saída.</td></tr>
+<tr><td>Horizonte do plan</td><td>12, 24 ou 36 meses de proxección.</td></tr>
+<tr><td>Marxe seguridade recría</td><td>Puntos conservadores aplicados ás taxas utilizadas para cubrir reposición futura.</td></tr>
+<tr><td>Marxe vacas en leite</td><td>Número de vacas por riba do obxectivo que se admite como colchón operativo.</td></tr>
+<tr><td>Idade máxima tenreiro / idade vaca</td><td>Límites de idade usados para clasificar os eventos históricos.</td></tr>
+<tr><td>Custos económicos</td><td>Valores utilizados para estimar perdas por mortes de tenreiros, xovencas, machos e vacas.</td></tr>
+</tbody></table>
+
+<h3>11. Sistema de puntuación de descartes</h3>
+<p>O ranking non decide automaticamente a saída: ordena as candidatas. Antes de puntuar aplícanse filtros de protección. As primíparas e as vacas 2+ teñen DEL mínimos distintos, e unha vaca próxima ao parto pode quedar protexida durante os días configurados.</p>
+<p>As primíparas compáranse coa media das primíparas e as vacas de 2ª+ coa media das adultas. Unha primípara só se suxire cando está polo menos a porcentaxe configurada por debaixo da súa media.</p>
+<p>A puntuación combina catro compoñentes e os seus pesos deben sumar 100 %: <strong>leite normalizado</strong>, <strong>produción prevista a 305 días</strong>, <strong>células</strong> e <strong>tempo no robot/cubículo</strong>. Menor leite/305 é peor; máis células e máis tempo son peores. O leite normalizado utiliza <code>FPCM = leite24 × (0,337 + 0,116×graxa + 0,060×proteína)</code>, referido a 4,0 % de graxa e 3,3 % de proteína.</p>
+
+<h3>12. Regulación de recría</h3>
+<p><strong>Regular recría</strong> conserva o plan base e permite crear un escenario alternativo. O algoritmo recomenda cantos animais convén valorar, pero a selección é sempre manual.</p>
+<p>Escolles un único <strong>mes de saída</strong>. A lista mostra toda a recría dispoñible con identificación, idade actual en meses e estado reprodutivo. As preñadas mostran días de xestación e parto probable; as inseminadas mostran parto probable; as que aínda non están inseminadas mostran IA probable e parto probable. As candidatas que afectan directamente a un pico de primeiros partos quedan destacadas en amarelo; o amarelo non indica estado reprodutivo. O estado reprodutivo móstrase sempre no campo ESTADO ACTUAL. Ao marcar un animal, mantéñense os eventos anteriores á saída e elimínanse do escenario os posteriores; despois recalcúlanse táboa, calendario e comparativa.</p>
+<p>Identificación: úsase o número do robot cando existe; a recría real sen número de robot aparece co seu crotal <strong>ES…</strong>; a primeira xeración virtual aparece como <strong>Filla de X</strong>. O selector de regulación usa o <strong>Nº de lactación do robot como regra autoritativa</strong>: só mostra animais coa lactación baleira e a primeira xeración virtual. Se aparece 1, 2, 3… o animal xa pariu e queda fóra da recría, independentemente da idade. As fillas virtuais poden chegar á IA e ao primeiro parto dentro do horizonte, pero nunca xeran netas.</p>
+<h3>13. PDF e Excel</h3>
+<p><strong>Informe PDF</strong> crea unha vista independente da interface e preparada en A4 horizontal. Inclúe o período analizado, análise histórica global, media ponderada, detalle anual, parámetros utilizados e a táboa mensual de planificación. O diálogo créase desde a propia páxina, sen abrir unha xanela emerxente, polo que non depende do bloqueador de popups. Escolle “Gardar como PDF”.</p>
+<p><strong>Excel</strong> exporta un ficheiro <code>.xlsx</code> real coa táboa de planificación para poder filtrala ou traballala despois.</p>
+
+<h3>14. Cargas por URL</h3>
+<p>Libro e robot poden cargarse localmente ou desde URL. A app resolve ligazóns habituais de Dropbox e Google Drive/Sheets e garda as 10 últimas URLs distintas. O ficheiro debe ser accesible; se o provedor bloquea CORS ou require permisos, hai que empregar unha ligazón pública de descarga ou o ficheiro local.</p>
+
+<h3>15. Que revisar se algo non cadra</h3>
+<p>Comproba Data situación, que o robot pertence exactamente a esa data, obxectivo de leite, marxe, DEL de IA de primíparas/adultas, taxas de preñez, período seco, lactacións medias e DEL terminal. No calendario diario podes verificar que cada animal entra no ciclo na data esperada.</p>
+
+  </div>
+</article>
+</section>
+
+<section class="bloque-axuda axuda-calendario-interno">
+<h3>Calendario interno do planificador</h3>
+<p><strong>O informe do robot é obrigatorio.</strong> Sen el non se calcula a planificación. As columnas <strong>Sexado</strong> e <strong>Descarte</strong> tamén son obrigatorias.</p>
+<p><strong>Sexado admite S, N ou C:</strong> S = seme sexado (90 % femia), N = seme normal/convencional (50 % femia) e C = carne. Un parto de carne conta como parto para o fluxo da vaca, pero a súa femia non se incorpora á recría leiteira.</p>
+<p><strong>Descarte admite S ou N.</strong> Unha vaca Descarte=S non recibe novas IA. Ao chegar á duración media de lactación de descarte convértese en candidata a saída; só se elimina se o calendario comproba que o lote de ordeño pode soportalo tamén nos meses seguintes.</p>
+<p><strong>Feitos:</strong> as preñadas do robot xeran parto e secado nas datas coñecidas. O tipo de seme determina a probabilidade de sexo da cría.</p>
+<p><strong>Inseminadas:</strong> aplícase a taxa de preñez de xovencas ou vacas. Despois aplícase 90 % femia se S, 50 % se N e 0 % de recría leiteira se C.</p>
+<p><strong>Aínda sen inseminar:</strong> as xovencas entran no calendario cando alcanzan a idade de primeira IA e o plan prioriza sexado. As vacas entran cando alcanzan os DEL medios de primeira IA; úsase convencional por defecto e só se recomenda sexado en vacas cando o sexado dispoñible en xovencas non chega para cubrir a reposición.</p>
+<p><strong>Obxectivo:</strong> manter o número de vacas en ordeño coa menor recría necesaria. Se o calendario xa prevé femias suficientes, reduce o sexado e deixa espazo para carne. Se hai exceso futuro de recría, indícao antes de criar animais innecesarios.</p>
+<p><strong>Táboa mensual:</strong> mostra leite ao inicio, partos, secados, descartes, leite ao final, secas, recría prevista e IA recomendadas. O detalle de cada fila explica que animais e probabilidades producen esa recomendación.</p>
+<p><strong>Horizonte:</strong> calcúlase ata os meses configurados (12/24/36) ou ata o límite xeracional da femia máis nova existente, o que chegue antes. Nunca se inventan fillas de animais que aínda non naceron.</p>
+</section>
+</main></div><script type="module" src="/src/app.js"></script></body></html>
