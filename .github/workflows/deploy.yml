@@ -2,8 +2,8 @@ name: Deploy Recria to GitHub Pages
 
 on:
   push:
-    branches: ["main"]
-
+    branches:
+      - main
   workflow_dispatch:
 
 permissions:
@@ -12,18 +12,22 @@ permissions:
   id-token: write
 
 concurrency:
-  group: "pages"
-  cancel-in-progress: false
+  group: pages
+  cancel-in-progress: true
 
 jobs:
-  build:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
     runs-on: ubuntu-latest
 
     steps:
       - name: Descargar repositorio
         uses: actions/checkout@v4
 
-      - name: Configurar Node
+      - name: Configurar Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -32,16 +36,17 @@ jobs:
       - name: Instalar dependencias
         run: npm ci
 
-      - name: Compilar aplicación
+      - name: Compilar con Vite
         run: npm run build
 
-      - name: Configurar Pages
+      - name: Configurar GitHub Pages
         uses: actions/configure-pages@v5
 
-      - name: Subir aplicación
+      - name: Subir dist
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./dist
 
-      - name: Publicar
+      - name: Desplegar GitHub Pages
+        id: deployment
         uses: actions/deploy-pages@v4
