@@ -410,3 +410,11 @@ Para xerar produción:
     npm run build
 
 A saída final queda en `dist/`.
+
+
+## v0.10.22
+- Produción preparada para o dominio personalizado `https://recria.pumar.gal/` (`base: '/'`).
+- Eliminado o axuste específico de `file://`; o build de produción é o estándar de Vite para GitHub Pages/dominio propio.
+- O bloque explicativo do calendario interno queda exclusivamente dentro de Axuda.
+- Axuda ampliada coa explicación paso a paso de Regular recría, picos, selección manual, mes de saída, recálculo e comparación co plan base.
+- Corrixida a lectura das referencias históricas: reposición anual/global/simple é numérica e a ponderada usa `mediaPonderada.vacas.reposicion.taxa`.

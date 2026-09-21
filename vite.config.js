@@ -1,10 +1,8 @@
 import { defineConfig } from 'vite'
 
 export default defineConfig({
-  // GitHub Pages:
-  // https://tonipumar.github.io/Recria/
-  base: '/Recria/',
-
+  // Produción no dominio personalizado: https://recria.pumar.gal/
+  base: '/',
   build: {
     chunkSizeWarningLimit: 700
   }

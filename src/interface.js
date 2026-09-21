@@ -289,17 +289,17 @@ function mediaSimpleHistorica(estatisticas) {
   const completos=(estatisticas?.anos||[]).filter(x=>x.completo);
   const base=completos.length?completos:(estatisticas?.anos||[]);
   const media=f=>{const v=base.map(f).filter(Number.isFinite);return v.length?v.reduce((a,b)=>a+b,0)/v.length:0;};
-  return {femias:media(x=>x.femias?.taxa),xovencas:media(x=>x.xovencas?.taxa),reposicion:media(x=>x.vacas?.reposicion?.taxa)};
+  return {femias:media(x=>x.femias?.taxa),xovencas:media(x=>x.xovencas?.taxa),reposicion:media(x=>x.vacas?.reposicion)};
 }
 
 function referenciaHistorica(estatisticas, clave) {
   if(clave?.startsWith("ano:")){
     const ano=Number(clave.slice(4)); const x=estatisticas?.anos?.find(a=>a.ano===ano);
-    if(x) return {femias:x.femias?.taxa||0,xovencas:x.xovencas?.taxa||0,reposicion:x.vacas?.reposicion?.taxa||0,descricion:`Ano ${ano}${x.completo?"":" (parcial)"}`};
+    if(x) return {femias:x.femias?.taxa||0,xovencas:x.xovencas?.taxa||0,reposicion:x.vacas?.reposicion||0,descricion:`Ano ${ano}${x.completo?"":" (parcial)"}`};
   }
   if(clave==="media") { const m=mediaSimpleHistorica(estatisticas); return {...m,descricion:"Media simple dos anos completos"}; }
-  if(clave==="global") return {femias:estatisticas?.global?.femias?.taxa||0,xovencas:estatisticas?.global?.xovencas?.taxa||0,reposicion:estatisticas?.global?.vacas?.reposicion?.taxa||0,descricion:"Período completo cargado"};
-  return {femias:taxaReferencia(estatisticas?.mediaPonderada?.femias?.taxa,estatisticas?.global?.femias?.taxa),xovencas:taxaReferencia(estatisticas?.mediaPonderada?.xovencas?.taxa,estatisticas?.global?.xovencas?.taxa),reposicion:taxaReferencia(estatisticas?.mediaPonderada?.vacas?.reposicion?.taxa,estatisticas?.global?.vacas?.reposicion?.taxa),descricion:"Media ponderada dos anos completos"};
+  if(clave==="global") return {femias:estatisticas?.global?.femias?.taxa||0,xovencas:estatisticas?.global?.xovencas?.taxa||0,reposicion:estatisticas?.global?.vacas?.reposicion||0,descricion:"Período completo cargado"};
+  return {femias:estatisticas?.mediaPonderada?.femias?.taxa||0,xovencas:estatisticas?.mediaPonderada?.xovencas?.taxa||0,reposicion:estatisticas?.mediaPonderada?.vacas?.reposicion?.taxa||0,descricion:"Media ponderada dos anos completos"};
 }
 
 function configurarReferenciaHistorica(estatisticas){

@@ -1,12 +1,12 @@
 {
   "name": "recria",
-  "version": "0.10.21",
+  "version": "0.10.22",
   "private": true,
   "description": "Análise histórica de mortalidade, reposición e rebaño",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && node scripts/postbuild.js",
+    "build": "vite build",
     "preview": "vite preview"
   },
   "dependencies": {
