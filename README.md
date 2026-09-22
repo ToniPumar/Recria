@@ -418,3 +418,9 @@ A saída final queda en `dist/`.
 - O bloque explicativo do calendario interno queda exclusivamente dentro de Axuda.
 - Axuda ampliada coa explicación paso a paso de Regular recría, picos, selección manual, mes de saída, recálculo e comparación co plan base.
 - Corrixida a lectura das referencias históricas: reposición anual/global/simple é numérica e a ponderada usa `mediaPonderada.vacas.reposicion.taxa`.
+
+
+## v0.10.23
+- Bloqueo completo da interface por baixo de 1280×720: non se pode acceder aos formularios mediante scroll.
+- Aviso responsive para móbil, tablet e ordenador.
+- O aviso desaparece automaticamente ao recuperar unha resolución compatible.

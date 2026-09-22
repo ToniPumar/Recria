@@ -1,15 +1,40 @@
 * { box-sizing: border-box; }
 html, body { margin: 0; width: 100%; min-width: 1280px; min-height: 720px; font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f4f6f8; color: #1d252c; }
 #aviso-resolucion { display: none; }
+
+/* Bloqueo real da aplicación cando a xanela non chega á resolución mínima.
+   A clase actualízase por JS en cada resize/orientationchange, polo que tamén
+   desaparece automaticamente ao recuperar unha resolución compatible. */
+html.resolucion-incompatible,
+body.resolucion-incompatible { min-width: 0 !important; min-height: 0 !important; overflow: hidden !important; }
+body.resolucion-incompatible #aplicacion { display: none !important; }
+body.resolucion-incompatible #aviso-resolucion {
+  position: fixed; inset: 0; z-index: 999999; display: flex !important;
+  align-items: center; justify-content: center; overflow: auto;
+  width: 100%; min-height: 100dvh; padding: clamp(18px, 5vw, 48px);
+  background: #f4f6f8;
+}
+.aviso-resolucion-contido {
+  width: min(100%, 560px); padding: clamp(22px, 5vw, 42px); text-align: center;
+  background: #fff; border: 1px solid #dfe4e8; border-radius: 14px;
+  box-shadow: 0 18px 55px rgba(23,32,39,.12);
+}
+.aviso-icono { font-size: clamp(38px, 10vw, 56px); margin-bottom: 16px; }
+.aviso-resolucion-contido h1 { margin: 0 0 14px; font-size: clamp(23px, 6vw, 30px); line-height: 1.15; }
+.aviso-resolucion-contido p { margin: 9px 0; color: #67727c; font-size: clamp(14px, 3.8vw, 16px); line-height: 1.55; }
+.aviso-instrucion { max-width: 460px; margin-inline: auto !important; }
+.resolucion-actual { margin-top: 22px; padding: 12px; background: #f7f9fa; border: 1px solid #dfe4e8; border-radius: 8px; }
+
+/* Fallback previo a que arranque JavaScript: evita que se poida desprazar
+   lateralmente ata os formularios nun móbil ou nunha xanela pequena. */
 @media (max-width: 1279px), (max-height: 719px) {
-  html, body { min-width: 0; min-height: 0; }
-  #aplicacion { display: none; }
-  #aviso-resolucion { display: flex; width: 100vw; height: 100vh; align-items: center; justify-content: center; background: #f4f6f8; }
-  .aviso-resolucion-contido { width: 520px; text-align: center; }
-  .aviso-icono { font-size: 48px; margin-bottom: 20px; }
-  .aviso-resolucion-contido h1 { margin: 0 0 12px; font-size: 28px; }
-  .aviso-resolucion-contido p { color: #67727c; line-height: 1.6; }
-  .resolucion-actual { margin-top: 24px; padding: 12px; background: white; border: 1px solid #dfe4e8; border-radius: 8px; }
+  html, body { min-width: 0; min-height: 0; overflow: hidden; }
+  #aplicacion { display: none !important; }
+  #aviso-resolucion {
+    position: fixed; inset: 0; z-index: 999999; display: flex; align-items: center;
+    justify-content: center; overflow: auto; width: 100%; min-height: 100dvh;
+    padding: clamp(18px, 5vw, 48px); background: #f4f6f8;
+  }
 }
 #aplicacion { display: flex; width: 100%; min-height: 100vh; }
 .menu-lateral { width: 260px; flex: 0 0 260px; min-height: 100vh; background: #172027; color: white; display: flex; flex-direction: column; }

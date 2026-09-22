@@ -254,6 +254,8 @@ function mostrarRebanoNaData(data) {
 
 actualizarResolucion();
 window.addEventListener("resize", actualizarResolucion);
+window.addEventListener("orientationchange", actualizarResolucion);
+window.visualViewport?.addEventListener("resize", actualizarResolucion);
 inicializarConfiguracion(recalcularUltimoLibro);
 inicializarSelectorArquivo(procesarArquivo);
 

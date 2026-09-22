@@ -335,8 +335,24 @@ function abrirSelectorArquivo() {
 }
 
 export function actualizarResolucion() {
+  const ancho = window.innerWidth;
+  const alto = window.innerHeight;
+  const compatible = ancho >= 1280 && alto >= 720;
   const elemento = document.getElementById("resolucion-actual");
-  if (elemento) elemento.textContent = `${window.innerWidth} × ${window.innerHeight}`;
+  const avisoDispositivo = document.getElementById("aviso-dispositivo");
+
+  if (elemento) elemento.textContent = `${ancho} × ${alto} px`;
+
+  const tactil = window.matchMedia?.("(pointer: coarse)")?.matches || navigator.maxTouchPoints > 1;
+  const tipo = tactil && Math.min(ancho, alto) < 600 ? "móbil" : tactil ? "tablet" : "ordenador";
+  if (avisoDispositivo) {
+    avisoDispositivo.textContent = tipo === "ordenador"
+      ? "O tamaño actual da xanela non é compatible coa aplicación."
+      : `A aplicación non está dispoñible neste ${tipo} con esta resolución.`;
+  }
+
+  document.documentElement.classList.toggle("resolucion-incompatible", !compatible);
+  document.body.classList.toggle("resolucion-incompatible", !compatible);
 }
 
 export function inicializarSelectorArquivo(callback) {
