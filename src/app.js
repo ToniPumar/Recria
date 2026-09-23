@@ -20,7 +20,8 @@ import {
   obterDatosPlanificacion,
   mostrarResultadoPlanificacion,
   mostrarErroPlanificacion,
-  reiniciarModoAutomaticoPlanificacion
+  reiniciarModoAutomaticoPlanificacion,
+  executarConBloqueoCalculo
 } from "./interface.js";
 
 const NOMES_CAMPOS = { crotal: "Crotal", sexo: "Sexo", dataNacemento: "Data de nacemento", baixa: "Baixa", dataBaixa: "Data de baixa" };
@@ -149,7 +150,8 @@ function obterResumoSituacionPlanificacion(data) {
   };
 }
 
-function calcularEscenarioPlanificacion() {
+async function calcularEscenarioPlanificacion() {
+  return executarConBloqueoCalculo(async () => {
   if (!ultimoLibro || !ultimoPeriodo || !ultimasEstatisticas) {
     return mostrarPlanificacionSenLibro();
   }
@@ -190,6 +192,7 @@ function calcularEscenarioPlanificacion() {
     console.error(erro);
     mostrarErroPlanificacion(erro instanceof Error ? erro.message : "Non se puido completar a planificación.");
   }
+  }, "Calculando planificación…");
 }
 
 async function cargarInformeRobot(arquivo, dataInforme) {
@@ -256,7 +259,7 @@ actualizarResolucion();
 window.addEventListener("resize", actualizarResolucion);
 window.addEventListener("orientationchange", actualizarResolucion);
 window.visualViewport?.addEventListener("resize", actualizarResolucion);
-inicializarConfiguracion(recalcularUltimoLibro);
+inicializarConfiguracion(() => executarConBloqueoCalculo(async () => recalcularUltimoLibro(), "Actualizando cálculos…"));
 inicializarSelectorArquivo(procesarArquivo);
 
 // Se xa hai un Libro cargado, modificar o período debe recalcular o Resumo

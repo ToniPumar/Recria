@@ -420,7 +420,13 @@ A saída final queda en `dist/`.
 - Corrixida a lectura das referencias históricas: reposición anual/global/simple é numérica e a ponderada usa `mediaPonderada.vacas.reposicion.taxa`.
 
 
-## v0.10.23
+## v0.10.24
 - Bloqueo completo da interface por baixo de 1280×720: non se pode acceder aos formularios mediante scroll.
 - Aviso responsive para móbil, tablet e ordenador.
 - O aviso desaparece automaticamente ao recuperar unha resolución compatible.
+
+
+## v0.10.24
+- Identidade PUMAR: logo na interface e favicon propio.
+- Bloqueo global de cálculo cun mínimo visual de 3 segundos.
+- Referencia personalizada (0–90 %) para mortalidade de femias na planificación.

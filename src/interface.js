@@ -7,6 +7,33 @@ import {
 } from "./configuracion.js";
 import { descargarArquivoUrl, obterUltimasUrls, gardarUrl } from "./url.js";
 
+
+let bloqueoCalculoInicio = 0;
+let bloqueoCalculoProfundidade = 0;
+
+export async function executarConBloqueoCalculo(traballo, mensaxe = "Calculando planificación…", minimoMs = 3000) {
+  const overlay = document.getElementById("bloqueo-calculo-global");
+  const texto = document.getElementById("bloqueo-calculo-mensaxe");
+  if (texto) texto.textContent = mensaxe;
+  if (bloqueoCalculoProfundidade === 0) {
+    bloqueoCalculoInicio = performance.now();
+    if (overlay) overlay.hidden = false;
+    document.body.classList.add("calculando-global");
+    await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+  }
+  bloqueoCalculoProfundidade++;
+  try {
+    return await traballo();
+  } finally {
+    bloqueoCalculoProfundidade = Math.max(0, bloqueoCalculoProfundidade - 1);
+    if (bloqueoCalculoProfundidade === 0) {
+      const restante = Math.max(0, minimoMs - (performance.now() - bloqueoCalculoInicio));
+      if (restante) await new Promise(resolve => setTimeout(resolve, restante));
+      if (overlay) overlay.hidden = true;
+      document.body.classList.remove("calculando-global");
+    }
+  }
+}
 function escaparHTML(valor) {
   return String(valor ?? "")
     .replaceAll("&", "&amp;")
@@ -306,10 +333,24 @@ function configurarReferenciaHistorica(estatisticas){
   const select=document.getElementById("plan-referencia-historica"); if(!select) return;
   const gardada=localStorage.getItem("recria_referencia_historica")||"ponderada";
   const anos=(estatisticas?.anos||[]).map(x=>`<option value="ano:${x.ano}">${x.ano}${x.completo?"":" · parcial"}</option>`).join("");
-  select.innerHTML=`<option value="ponderada">Media ponderada</option><option value="media">Media simple</option><option value="global">Período completo</option>${anos}`;
+  select.innerHTML=`<option value="ponderada">Media ponderada</option><option value="media">Media simple</option><option value="global">Período completo</option><option value="personalizada">Personalizada · mortalidade femias</option>${anos}`;
   select.value=[...select.options].some(o=>o.value===gardada)?gardada:"ponderada";
   const aplicar=()=>{
-    const r=referenciaHistorica(estatisticas,select.value);
+    let r=referenciaHistorica(estatisticas,select.value);
+    const personalizada=select.value==="personalizada";
+    const wrap=document.getElementById("plan-personalizada-femias-wrap");
+    const inputPersonalizado=document.getElementById("plan-mort-femias-personalizada");
+    if(wrap) wrap.hidden=!personalizada;
+    if(personalizada){
+      const base=referenciaHistorica(estatisticas,"ponderada");
+      let taxa=Number(inputPersonalizado?.value);
+      if(!Number.isFinite(taxa)) taxa=Number(localStorage.getItem("recria_mort_femias_personalizada"));
+      if(!Number.isFinite(taxa)) taxa=base.femias||0;
+      taxa=Math.max(0,Math.min(90,taxa));
+      if(inputPersonalizado) inputPersonalizado.value=taxa;
+      r={...base,femias:taxa,descricion:`Personalizada · mortalidade femias ${taxa.toFixed(1)} %`};
+      try{localStorage.setItem("recria_mort_femias_personalizada",String(taxa));}catch{}
+    }
     document.getElementById("plan-mort-femias").value=Number(r.femias||0).toFixed(2);
     document.getElementById("plan-mort-xovencas").value=Number(r.xovencas||0).toFixed(2);
     document.getElementById("plan-reposicion").value=Number(r.reposicion||0).toFixed(2);
@@ -322,7 +363,7 @@ function configurarReferenciaHistorica(estatisticas){
       const el=document.getElementById(id); if(el) el.dispatchEvent(new Event("input",{bubbles:true}));
     });
   };
-  select.onchange=aplicar; aplicar();
+  select.onchange=aplicar; const inputPersonalizado=document.getElementById("plan-mort-femias-personalizada"); if(inputPersonalizado){ const gardada=Number(localStorage.getItem("recria_mort_femias_personalizada")); if(Number.isFinite(gardada)) inputPersonalizado.value=Math.max(0,Math.min(90,gardada)); inputPersonalizado.onchange=()=>{ let v=Number(inputPersonalizado.value); if(!Number.isFinite(v)) v=0; inputPersonalizado.value=Math.max(0,Math.min(90,v)); aplicar(); }; } aplicar();
 }
 
 function abrirSelectorArquivo() {
@@ -1042,8 +1083,8 @@ export function mostrarResultadoPlanificacion(resultado, callbackSeleccionDescar
     }).join("");
     const decisions=escenarioRegulado.decisions||[];
     ed.innerHTML=`<div class="reg-layout"><section class="reg-picos-panel"><div class="reg-seccion-titulo"><span class="reg-paso">1</span><div><strong>Picos detectados</strong><small>Prioriza as xovencas amarelas que alimentan estes picos.</small></div></div><div class="reg-recomendacions">${recHTML}</div></section><section class="reg-decision-panel"><div class="reg-seccion-titulo"><span class="reg-paso">2</span><div><strong>Decisión de saída</strong><small>Escolle o mes e marca os animais que queres retirar do escenario.</small></div></div><label class="reg-mes">Mes de saída <input type="month" id="mes-saida-recria" value="${escaparHTML(mesSaidaRecria)}"></label><small class="reg-data-aviso">Se escolles o mes da Data situación, a saída aplícase como mínimo desde ${formatoData(resultado.dataSituacion)}.</small><div class="reg-seleccion-kpi"><span>Seleccionadas</span><strong>${idsRegulados.size}</strong></div></section></div><div class="reg-lista-bloque"><div class="reg-lista-cabeceira"><div><strong>Xovencas de recría dispoñibles</strong><small>Só sen Nº de lactación + 1ª xeración virtual. Amarelo = afecta directamente a un pico recomendado.</small></div><span>${cand.length} dispoñibles</span></div><div class="reg-tabla-head"><span></span><span>Animal</span><span>Idade</span><span>Estado</span><span>IA probable</span><span>Parto probable</span><span>Impacto</span></div><div class="reg-lista">${filas||"<p>Non hai recría dispoñible no horizonte.</p>"}</div></div><div class="reg-decisions"><div><strong>Decisións aplicadas</strong><small>Saídas que modifican o escenario regulado.</small></div><div class="reg-decision-chips">${decisions.length?decisions.map(d=>`<span><b>${escaparHTML(d.identificacion)}</b><small>saída ${formatoData(d.dataSaida)}</small></span>`).join(""):"<small>Aínda non seleccionaches ningún animal.</small>"}</div></div>`;
-    ed.querySelector("#mes-saida-recria")?.addEventListener("change",e=>{mesSaidaRecria=e.target.value;recalcularEscenarioRegulado();pintarModoRegulacion();});
-    ed.querySelectorAll(".reg-check").forEach(inp=>inp.addEventListener("change",()=>{const id=String(inp.dataset.id||"");if(inp.checked)idsRegulados.add(id);else idsRegulados.delete(id);recalcularEscenarioRegulado();pintarModoRegulacion();}));
+    ed.querySelector("#mes-saida-recria")?.addEventListener("change",async e=>{mesSaidaRecria=e.target.value;await executarConBloqueoCalculo(async()=>{recalcularEscenarioRegulado();pintarModoRegulacion();},"Recalculando regulación de recría…");});
+    ed.querySelectorAll(".reg-check").forEach(inp=>inp.addEventListener("change",async()=>{const id=String(inp.dataset.id||"");if(inp.checked)idsRegulados.add(id);else idsRegulados.delete(id);await executarConBloqueoCalculo(async()=>{recalcularEscenarioRegulado();pintarModoRegulacion();},"Recalculando regulación de recría…");}));
   };
 
   const pintarModoRegulacion=()=>{

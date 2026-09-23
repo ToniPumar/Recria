@@ -1,6 +1,6 @@
 {
   "name": "recria",
-  "version": "0.10.23",
+  "version": "0.10.24",
   "private": true,
   "description": "Análise histórica de mortalidade, reposición e rebaño",
   "type": "module",

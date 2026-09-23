@@ -39,7 +39,7 @@ body.resolucion-incompatible #aviso-resolucion {
 #aplicacion { display: flex; width: 100%; min-height: 100vh; }
 .menu-lateral { width: 260px; flex: 0 0 260px; min-height: 100vh; background: #172027; color: white; display: flex; flex-direction: column; }
 .logo { height: 90px; display: flex; align-items: center; gap: 12px; padding: 0 24px; border-bottom: 1px solid rgba(255,255,255,.08); }
-.logo-icono { width: 42px; height: 42px; display: grid; place-items: center; background: #5fa55a; border-radius: 9px; font-size: 20px; font-weight: 700; }
+.logo-pumar-menu { width: 48px; height: 48px; object-fit: cover; border-radius: 10px; background: white; box-shadow: 0 2px 10px rgba(0,0,0,.22); }
 .logo-titulo { font-weight: 700; font-size: 18px; }
 .logo-subtitulo { margin-top: 2px; font-size: 11px; color: #95a1aa; }
 .menu { padding: 20px 14px; }
@@ -1472,3 +1472,20 @@ body.resolucion-incompatible #aviso-resolucion {
 .reg-tooltip{left:42px;top:calc(100% - 2px);width:400px}.reg-decisions{display:grid;grid-template-columns:190px 1fr;gap:14px;margin:0;padding:14px 16px;border-top:1px solid #e3e7ea;background:#fafbfc}.reg-decisions>div:first-child{display:flex;flex-direction:column;gap:2px}.reg-decisions>div:first-child small{color:#6b767e}.reg-decision-chips{display:flex;gap:7px;flex-wrap:wrap}.reg-decision-chips>span{display:flex;flex-direction:column;gap:1px;padding:6px 9px;border-radius:8px;background:#eaf1ec}.reg-decision-chips>span small{color:#637067}
 .tabela-scroll-plan{margin-top:22px;padding-top:4px}.tabela-balance-rabano thead th{position:sticky;top:0;z-index:3}.tabela-balance-rabano td:nth-child(2){white-space:nowrap}.tabela-balance-rabano td:nth-child(3),.tabela-balance-rabano td:nth-child(7),.tabela-balance-rabano td:nth-child(8){background:rgba(70,105,83,.035)}
 @media(max-width:1180px){.comparativa-kpis{grid-template-columns:repeat(3,1fr)}.reg-layout{grid-template-columns:1fr}.reg-decision-panel{border-left:0;border-top:1px solid #e3e7ea}.reg-tabla-head{display:none}.reg-lista .reg-animal.reg-animal-tooltip{grid-template-columns:30px minmax(150px,1fr) 90px minmax(150px,1fr) 110px!important;grid-template-areas:"check id idade estado pico" "check id ia parto pico"!important}.reg-recomendacions{grid-template-columns:1fr 1fr}}
+
+
+/* v0.10.24 · identidade PUMAR e bloqueo global de cálculo */
+.bloqueo-calculo-global[hidden]{display:none!important}
+.bloqueo-calculo-global{position:fixed;inset:0;z-index:1000000;display:grid;place-items:center;padding:24px;background:rgba(244,246,248,.94);backdrop-filter:blur(5px)}
+body.calculando-global{overflow:hidden!important}
+body.calculando-global #aplicacion{pointer-events:none;user-select:none}
+.bloqueo-calculo-tarxeta{width:min(92vw,420px);display:flex;flex-direction:column;align-items:center;gap:11px;padding:28px 30px 26px;border:1px solid #dce3e7;border-radius:18px;background:#fff;box-shadow:0 22px 65px rgba(20,31,38,.18);text-align:center}
+.bloqueo-calculo-tarxeta img{width:150px;height:150px;object-fit:contain;border-radius:14px}
+.bloqueo-calculo-tarxeta strong{font-size:1.1rem}.bloqueo-calculo-tarxeta span{color:#71808a;font-size:.86rem}
+.spinner-calculo{width:30px;height:30px;border:3px solid #dce6df;border-top-color:#467f43;border-radius:50%;animation:xiro-calculo .75s linear infinite}
+@keyframes xiro-calculo{to{transform:rotate(360deg)}}
+.selector-referencia{display:grid;grid-template-columns:minmax(280px,1fr) minmax(280px,1fr);gap:14px;align-items:end}
+.referencia-personalizada{padding:12px 14px;border:1px solid #dce3e7;border-radius:9px;background:#f8faf9}
+.referencia-personalizada[hidden]{display:none!important}
+.referencia-personalizada input{width:100%;margin-top:6px}
+@media(max-width:900px){.selector-referencia{grid-template-columns:1fr}.bloqueo-calculo-tarxeta img{width:120px;height:120px}}
