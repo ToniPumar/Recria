@@ -466,11 +466,13 @@ function crearObxectivosReprodutivos({presentes,inicio,fin,reproducion,datosRobo
   for(const mesIA of meses){
     const pipe=mapaPipe.get(mesIA)||{};
     const iaX=Math.max(0,Number(pipe.iaObligatoriasXovencas)||0);
+    // As IA da primeira xeración virtual tamén son IA de xovencas, sempre sexadas.
+    const iaVirtual=Math.max(0,Number(pipe.iaXeracionVirtual)||0);
     const iaV=Math.max(0,Number(pipe.iaObligatoriasVacas)||0);
-    if(iaX+iaV<0.01) continue;
+    if(iaX+iaVirtual+iaV<0.01) continue;
 
     // Primeiro sexado en xovencas; só sexamos vacas se coas xovencas non chega.
-    const maxX=Math.max(0,Math.round(iaX));
+    const maxX=Math.max(0,Math.round(iaX+iaVirtual));
     const maxV=Math.max(0,Math.round(iaV));
     // Regra económica/xenética: toda xovenca existente que chega á IA vai con sexado.
     // Non reducimos estas IA aínda que a reposición xa estea cuberta.
@@ -495,7 +497,7 @@ function crearObxectivosReprodutivos({presentes,inicio,fin,reproducion,datosRobo
 
     filas.push({
       mes:mesIA,etiqueta:etiquetaMes(mesIA),paraPartos,
-      iaObligatoriasXovencas:maxX,iaObligatoriasVacas:maxV,totalIA,
+      iaObligatoriasXovencas:maxX,iaObligatoriasVacas:maxV,iaXeracionVirtual:iaVirtual,totalIA,
       sexadosXovencas,sexadosVacas,sexados:sexadosXovencas+sexadosVacas,
       carnes,carnesXovencas:carnesX,carnesVacas:carnesV,convencionais:0,
       prenecesEsperadasNovas,femiasEsperadasNovas,

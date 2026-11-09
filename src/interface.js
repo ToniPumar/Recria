@@ -243,7 +243,8 @@ function activarGardadoAutomaticoConfiguracion(callbackDespoisDeGardar=null){
 
 export function inicializarConfiguracion(callbackGardada) {
   cargarInputsConfiguracion(cargarConfiguracion());
-  activarGardadoAutomaticoConfiguracion(callbackGardada);
+  // Gardado automático silencioso: non recalcular nin mostrar o logo en cada edición.
+  activarGardadoAutomaticoConfiguracion();
 
   document.getElementById("boton-gardar-configuracion")?.addEventListener("click", () => {
     const economia = obterParametrosEconomicos();
